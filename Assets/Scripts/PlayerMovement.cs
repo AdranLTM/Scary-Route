@@ -4,8 +4,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     public CharacterController controller;
-    public Transform groundCheck;
-    public LayerMask groundMask;
+    // LayerMask a groundCheck jsou úplnì smazané
 
     [Header("Movement")]
     public float walkSpeed = 6f;
@@ -14,7 +13,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jump & Gravity")]
     public float gravity = -9.81f;
     public float jumpHeight = 3f;
-    public float groundDistance = 0.4f;
 
     [Header("Stamina")]
     public float maxStamina = 10f;
@@ -23,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
     public float staminaRechargeDelay = 1f;
 
     private Vector3 velocity;
-
     private float currentStamina;
     private float rechargeTimer;
 
@@ -38,12 +35,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Kontrola zemì
-        IsGrounded = Physics.CheckSphere(
-            groundCheck.position,
-            groundDistance,
-            groundMask
-        );
+        // Automatická detekce zemì zabudovaná pøímo v Character Controlleru
+        IsGrounded = controller.isGrounded;
 
         if (IsGrounded && velocity.y < 0)
         {
@@ -60,18 +53,13 @@ public class PlayerMovement : MonoBehaviour
         IsMoving = move.magnitude > 0.1f;
 
         // Sprint
-        bool wantsToSprint =
-            Input.GetKey(KeyCode.LeftShift) &&
-            IsMoving &&
-            currentStamina > 0f;
+        bool wantsToSprint = Input.GetKey(KeyCode.LeftShift) && IsMoving && currentStamina > 0f;
 
         if (wantsToSprint)
         {
             IsSprinting = true;
-
             currentStamina -= staminaDrainRate * Time.deltaTime;
             currentStamina = Mathf.Clamp(currentStamina, 0f, maxStamina);
-
             rechargeTimer = staminaRechargeDelay;
         }
         else
@@ -90,7 +78,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float speed = IsSprinting ? sprintSpeed : walkSpeed;
-
         controller.Move(move * speed * Time.deltaTime);
 
         // Skok

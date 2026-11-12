@@ -4,7 +4,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     public CharacterController controller;
-    // LayerMask a groundCheck jsou úplnì smazané
+    public Animator anim; // Tady je pøidána reference na Animator
 
     [Header("Movement")]
     public float walkSpeed = 6f;
@@ -89,5 +89,13 @@ public class PlayerMovement : MonoBehaviour
         // Gravitace
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // ODESLÁNÍ STAVÙ DO ANIMATORU
+        if (anim != null)
+        {
+            anim.SetBool("isGrounded", IsGrounded);
+            anim.SetBool("isMoving", IsMoving);
+            anim.SetBool("isSprinting", IsSprinting);
+        }
     }
 }
